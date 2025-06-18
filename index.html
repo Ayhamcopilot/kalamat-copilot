@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>كلامات Copilot | تسجيل الدخول</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --main-color: #3498db;
+      --bg-color: #f7f7f7;
+      --dark-bg: #2c3e50;
+      --light-text: #ffffff;
+      --font: 'Segoe UI', Tahoma;
+    }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background-color: var(--bg-color);
+      transition: background 0.5s ease;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    h2 {
+      color: var(--main-color);
+    }
+    input, select {
+      padding: 10px;
+      width: 90%;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1em;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: var(--main-color);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #themeToggle {
+      margin-top: 15px;
+      font-size: 0.9em;
+      cursor: pointer;
+      color: #555;
+    }
+    #loginArea, #chatArea {
+      display: none;
+    }
+    #loginArea.active {
+      display: block;
+    }
+    #profile-preview {
+      margin-top: 10px;
+      max-width: 100px;
+      border-radius: 50%;
+      display: none;
+    }
+  </style>
+</head>
+
+<body onload="initPage()">
+
+  <div class="container">
+    <div id="loginArea" class="active">
+      <h2>أهلاً بك في كلامات Copilot 💬</h2>
+      <input type="text" id="username" placeholder="اسم المستخدم" />
+      <input type="email" id="email" placeholder="البريد الإلكتروني" />
+      <input type="password" id="pass1" placeholder="كلمة المرور" />
+      <input type="password" id="pass2" placeholder="تأكيد كلمة المرور" />
+      <input type="file" id="profilePic" accept="image/*" onchange="previewImage()" />
+      <img id="profile-preview" />
+      <select id="colorTheme">
+        <option value="#3498db">أزرق</option>
+        <option value="#27ae60">أخضر</option>
+        <option value="#8e44ad">بنفسجي</option>
+        <option value="#e67e22">برتقالي</option>
+      </select>
+      <button onclick="startChat()">دخول</button>
+      <div id="themeToggle" onclick="toggleTheme()">تبديل الوضع (نهاري/ليلي)</div>
+    </div>
+    </div> <!-- إغلاق loginArea -->
+
+    <div id="chatArea">
+      <h2 id="welcomeMsg">مرحباً بك!</h2>
+      <div id="chatBox" style="background:#fff; border-radius:8px; padding:10px; height:300px; overflow-y:auto; text-align:right; border:1px solid #ccc; margin-bottom:10px;"></div>
+      <input type="text" id="userMessage" placeholder="اكتب رسالتك..." />
+      <button onclick="sendMessage()">إرسال</button>
+      <br><br>
+      <button onclick="logout()" style="background:#e74c3c;">خروج</button>
+      <br><br>
+      <footer style="font-size:0.9em; color:#777;">
+        صُمّم بكل حب بواسطة Copilot 💙<br>
+        وبتوقيع المصمم المبدع: <b>أنت</b> 👑
+      </footer>
+    </div>
+  </div> <!-- نهاية .container -->
+
+  <audio id="pingSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+
+  <script>
+    let darkMode = false;
+
+    function initPage() {
+      document.getElementById('loginArea').classList.add('active');
+    }
+
+    function toggleTheme() {
+      darkMode = !darkMode;
+      document.body.style.backgroundColor = darkMode ? 'var(--dark-bg)' : 'var(--bg-color)';
+      document.body.style.color = darkMode ? 'var(--light-text)' : '#000';
+    }
+
+    function previewImage() {
+      const input = document.getElementById("profilePic");
+      const img = document.getElementById("profile-preview");
+      const file = input.files[0];
+      if (file) {
+        img.src = URL.createObjectURL(file);
+        img.style.display = "block";
+      }
+    }
+
+    function startChat() {
+      const name = document.getElementById("username").value;
+      const email = document.getElementById("email").value;
+      const p1 = document.getElementById("pass1").value;
+      const p2 = document.getElementById("pass2").value;
+      const color = document.getElementById("colorTheme").value;
+
+      if (!name || !email || !p1 || !p2) {
+        alert("يرجى تعبئة جميع الحقول");
+        return;
+      }
+
+      if (p1 !== p2) {
+        alert("كلمتا المرور غير متطابقتين");
+        return;
+      }
+
+      document.querySelector(':root').style.setProperty('--main-color', color);
+      document.getElementById("loginArea").style.display = "none";
+      document.getElementById("chatArea").style.display = "block";
+      document.getElementById("welcomeMsg").innerHTML = `مرحباً ${name} 👋`;
+
+      localStorage.setItem("username", name);
+    }
+
+    function sendMessage() {
+      const msg = document.getElementById("userMessage").value.trim();
+      if (!msg) return;
+      const box = document.getElementById("chatBox");
+      const p = document.createElement("p");
+      p.innerHTML = `👤 <b>${localStorage.getItem("username")}:</b> ${msg}`;
+      p.style.margin = "5px";
+      box.appendChild(p);
+      document.getElementById("userMessage").value = "";
+      box.scrollTop = box.scrollHeight;
+
+      document.getElementById("pingSound").play();
+    }
+
+    function logout() {
+      localStorage.clear();
+      location.reload();
+    }
+  </script>
+
+</body>
+</html>
